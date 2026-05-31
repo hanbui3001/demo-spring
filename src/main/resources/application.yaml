@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: Demo_Spring_Boot
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_management
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+
