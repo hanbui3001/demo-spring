@@ -7,13 +7,11 @@ import com.example.Demo_Spring_Boot.dto.response.ApiResponse;
 import com.example.Demo_Spring_Boot.dto.response.UserDetailResponse;
 import com.example.Demo_Spring_Boot.dto.response.UserRegisterResponse;
 import com.example.Demo_Spring_Boot.service.UserService;
+import com.example.Demo_Spring_Boot.dto.response.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,45 +19,79 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserRegisterResponse>> register(@RequestBody UserRegisterRequest request) throws Exception {
-        var data =  userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<UserRegisterResponse>builder()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .message("register successfully")
-                        .data(data)
-                        .build()
-        );
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<UserRegisterResponse> register(@RequestBody UserRegisterRequest request) throws Exception {
+        var data = userService.register(request);
+
+        return ApiResponse.<UserRegisterResponse>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("register successfully")
+                .data(data)
+                .build();
     }
+
     @PostMapping("/login")
-    public  ResponseEntity<ApiResponse<UserDetailResponse>> login(@RequestBody UserLoginRequest request) throws Exception {
-        var data =  userService.login(request);
-        return ResponseEntity.ok().body(
-                ApiResponse.<UserDetailResponse>builder()
-                        .statusCode(HttpStatus.OK.value())
-                        .message("login successfully")
-                        .data(data)
-                        .build()
-        );
+    public ApiResponse<UserDetailResponse> login(@RequestBody UserLoginRequest request) throws Exception {
+        var data = userService.login(request);
+
+        return ApiResponse.<UserDetailResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("login successfully")
+                .data(data)
+                .build();
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDetailResponse>> getUserById(@PathVariable String id) throws Exception {
+    public ApiResponse<UserDetailResponse> getUserById(@PathVariable String id) throws Exception {
         var data = userService.getUserById(id);
-        return ResponseEntity.ok().body(
-                ApiResponse.<UserDetailResponse>builder()
-                        .statusCode(HttpStatus.OK.value())
-                        .message("get user successfully")
-                        .data(data)
-                        .build()
-        );
+
+        return ApiResponse.<UserDetailResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("get user successfully")
+                .data(data)
+                .build();
     }
+
     @GetMapping("/list")
-    public List<UserDetailResponse> getUserList() throws Exception {
-        return userService.getUserList();
+    public ApiResponse<PageResponse<UserDetailResponse>> getUserList(
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false, defaultValue = "") String displayName
+    ) throws Exception {
+        var data = userService.getUserList(page, size, email, displayName);
+
+        return ApiResponse.<PageResponse<UserDetailResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("get user list successfully")
+                .data(data)
+                .build();
     }
+
     @PutMapping("/{id}")
-    public UserDetailResponse updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request) throws Exception {
-        return userService.updateUser(id, request);
+    public ApiResponse<UserDetailResponse> updateUser(
+            @PathVariable String id,
+            @RequestBody UserUpdateRequest request
+    ) throws Exception {
+        var data = userService.updateUser(id, request);
+
+        return ApiResponse.<UserDetailResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("update user successfully")
+                .data(data)
+                .build();
+    }
+
+    // projections
+    @GetMapping("/v1/{id}")
+    public ApiResponse<UserDetailResponse> getUserByIdV1(@PathVariable String id) throws Exception {
+        var data = userService.findUserById(id);
+
+        return ApiResponse.<UserDetailResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("get user successfully")
+                .data(data)
+                .build();
     }
 
 }
