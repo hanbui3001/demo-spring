@@ -8,9 +8,9 @@ import com.example.Demo_Spring_Boot.dto.response.UserDetailResponse;
 import com.example.Demo_Spring_Boot.dto.response.UserRegisterResponse;
 import com.example.Demo_Spring_Boot.service.UserService;
 import com.example.Demo_Spring_Boot.dto.response.PageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<UserRegisterResponse> register(@RequestBody UserRegisterRequest request) throws Exception {
+    public ApiResponse<UserRegisterResponse> register(@RequestBody @Valid UserRegisterRequest request) throws Exception {
         var data = userService.register(request);
 
         return ApiResponse.<UserRegisterResponse>builder()
